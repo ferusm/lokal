@@ -1,0 +1,9 @@
+{
+  "name": "SimpleSpecification",
+  "data": {
+    "someMessage": {
+      "default": "Hello, comrade",
+      "ru": "Привет, товарисч"
+    }
+  }
+}
