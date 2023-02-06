@@ -1,6 +1,5 @@
 {
-  "name": "SimpleSpecification",
-  "data": {
+  "http": {
     "someMessage": {
       "default": "Hello, comrade",
       "ru": "Привет, товарисч"

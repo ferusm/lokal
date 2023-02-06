@@ -6,37 +6,42 @@ import java.util.*
 object Generator {
     const val PACKAGE = "org.github.ferusm.lokal"
     const val NAME = "Lokal"
-    const val DEFAULT = "default"
 
     fun generate(vararg specifications: Specification): FileSpec {
-        val childObjects = specifications.map { spec ->
-            val name = spec.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else "$it" }
-            TypeSpec.objectBuilder(ClassName(PACKAGE, name)).also { type ->
-                val entryProperties = spec.data.map { (name, locales) ->
-                    val defaultValue = locales[DEFAULT] ?: throw IllegalArgumentException("Unspecified 'default' value")
-                    val getter = FunSpec.getterBuilder()
-                        .beginControlFlow("when(locale)").apply {
-                            locales.filter { (locale, _) -> locale != DEFAULT }.forEach { (locale, value) ->
-                                addStatement(""""$locale" -> "$value"""")
-                            }
-                            addStatement("""else -> "$defaultValue"""")
-                        }.endControlFlow()
-                        .build()
+        val groups = specifications.flatMap(Specification::groups)
+
+        val duplicatedNames = groups.getDuplicatedNames()
+        if (duplicatedNames.isNotEmpty()) {
+            throw IllegalArgumentException("Group name must be unique in scope off all specifications. Duplicated names: ${duplicatedNames.joinToString(", ")}")
+        }
+
+        val subTypes = groups.map { group ->
+            val name = group.name.capitalize()
+            val className = ClassName(PACKAGE, name)
+            TypeSpec.objectBuilder(className).also { type ->
+                val properties = group.texts.map { (name, locales) ->
+                    val getter = FunSpec.getterBuilder().beginControlFlow("when(locale)").also { function ->
+                        locales.translations.forEach { (locale, value) ->
+                            function.addStatement(""""$locale" -> "$value"""")
+                        }
+                        function.addStatement("""else -> "${locales.default}"""")
+                    }.endControlFlow().build()
                     PropertySpec.builder(name, String::class).getter(getter).build()
                 }
-                type.addProperties(entryProperties)
+                type.addProperties(properties)
             }.build()
         }
-        val parentObject = TypeSpec.objectBuilder(ClassName(PACKAGE, NAME)).apply {
-            val localeProperty = PropertySpec.builder("locale", String::class)
-                .mutable(true)
-                .initializer(""""$DEFAULT"""")
-                .build()
-            addProperty(localeProperty)
-            addTypes(childObjects)
-        }.build()
+        val className = ClassName(PACKAGE, NAME)
+        val rootType = TypeSpec.objectBuilder(className).apply { addTypes(subTypes) }.build()
         return FileSpec.builder(PACKAGE, "${NAME}.kt")
-            .addType(parentObject)
+            .addType(rootType)
             .build()
+    }
+
+    private fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else "$it" }
+
+    private fun List<Specification.Group>.getDuplicatedNames(): Collection<String> {
+        val groupNames = map(Specification.Group::name)
+        return groupNames - groupNames.toSet()
     }
 }
