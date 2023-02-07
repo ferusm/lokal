@@ -15,7 +15,7 @@ class SpecificationTest {
         val expectedSpecification = Specification(listOf(
             Specification.Group(name = "http", texts = mapOf(
                 "someMessage" to Specification.Entry(
-                    "someMessage", "Hello, comrade", mapOf("ru" to "Привет, товарисч")
+                    null, null, "someMessage", "Hello, comrade", mapOf("ru" to "Привет, товарисч")
                 )
             ))
         ))

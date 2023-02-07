@@ -7,12 +7,16 @@ import kotlin.test.assertEquals
 class GeneratorTest {
     @Test
     fun `Generator should process empty spec set`() {
-        val fileSpec = Generator.generate()
+        val fileSpec = Generator.generate("org.test.test", Specification(emptyList()))
         assertEquals(
             """
-            package ${Generator.PACKAGE}
+            package org.test.test
 
-            public object ${Generator.NAME}
+            import kotlin.String
+
+            public object LoKal {
+              public var locale: () -> String = {"default"}
+            }
 
         """.trimIndent(), fileSpec.asText()
         )
@@ -21,12 +25,16 @@ class GeneratorTest {
     @Test
     fun `Generator should process single spec without data`() {
         val specification = Specification(listOf(Specification.Group(name = "http", texts = emptyMap())))
-        val fileSpec = Generator.generate(specification)
+        val fileSpec = Generator.generate("org.test.test.test", specification)
         assertEquals(
             """
-            package ${Generator.PACKAGE}
+            package org.test.test.test
 
-            public object ${Generator.NAME} {
+            import kotlin.String
+            
+            public object LoKal {
+              public var locale: () -> String = { "default" }
+
               public object Http
             }
 
@@ -40,27 +48,44 @@ class GeneratorTest {
             listOf(
                 Specification.Group(
                     name = "http", texts = mapOf(
-                        "statusMessage" to Specification.Entry("statusMessage", "Hello", mapOf("ru" to "Привет"))
+                        "statusMessage" to Specification.Entry(
+                            null,
+                            null,
+                            "statusMessage",
+                            "Hello, {comrade}",
+                            mapOf("ru" to "Привет, {comrade}")
+                        )
                     )
                 )
             )
         )
-        val fileSpec = Generator.generate(specification)
+        val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals(
             """
-            package ${Generator.PACKAGE}
-
+            package org.test.test
+            
             import kotlin.String
-
-            public object ${Generator.NAME} {
+            
+            public object LoKal {
+              public var locale: () -> String = { "default" }
+            
               public object Http {
-                public val statusMessage: String
-                  get() {
-                    when(locale) {
-                      "ru" -> "Привет"
-                      else -> "Hello"
-                    }
+                public val statusMessage: StatusMessage
+                  get() = StatusMessage()
+            
+                public class StatusMessage {
+                  private var comrade: String = "undefined"
+            
+                  public fun comrade(comrade: String): StatusMessage {
+                    this.comrade = comrade
+                    return this
                   }
+            
+                  public override fun toString(): String = when(LoKal.locale()) {
+                    "ru" -> "Привет, ${"$"}{comrade}"
+                    else -> "Hello, ${"$"}{comrade}"
+                  }
+                }
               }
             }
 

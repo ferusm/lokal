@@ -30,10 +30,13 @@ object SpecificationSerializer : KSerializer<Specification> {
         val rootMap = serializer.deserialize(decoder)
         val groups = rootMap.map { (name, group) ->
             val entries = (group - META_KEY).mapValues { (name, entry) ->
-                val default = requireNotNull(entry[DEFAULT_KEY]) { "$DEFAULT_KEY field is required" }
-                val translations = entry - DEFAULT_KEY
+                val summary = entry[SUMMARY_KEY]
+                val description = entry[DESCRIPTION_KEY]
 
-                Specification.Entry(name, default, translations)
+                val default = requireNotNull(entry[DEFAULT_KEY]) { "$DEFAULT_KEY field is required" }
+                val translations = entry - DEFAULT_KEY - SUMMARY_KEY - DESCRIPTION_KEY
+
+                Specification.Entry(summary, description, name, default, translations)
             }
             val meta = group[META_KEY]
             val version = meta?.get(VERSION_KEY)
@@ -48,7 +51,11 @@ object SpecificationSerializer : KSerializer<Specification> {
     override fun serialize(encoder: Encoder, value: Specification) {
         val rootMap = value.groups.associate { group ->
             val entriesMap = group.texts.mapValues { (_, entry) ->
-                mapOf(DEFAULT_KEY to entry.default) + entry.translations
+                mapOf(
+                    SUMMARY_KEY to (entry.summary ?: ""),
+                    DESCRIPTION_KEY to (entry.description ?: ""),
+                    DEFAULT_KEY to entry.default,
+                ).filterValues(String::isNotEmpty) + entry.translations
             }
             val metaMap = mapOf(
                 VERSION_KEY to (group.version ?: ""),

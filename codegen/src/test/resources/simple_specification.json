@@ -1,5 +1,8 @@
 {
   "http": {
+    "$meta": {
+
+    },
     "someMessage": {
       "default": "Hello, comrade",
       "ru": "Привет, товарисч"

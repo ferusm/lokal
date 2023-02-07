@@ -10,9 +10,9 @@ data class Specification(
         const val DEFAULT_KEY = "default"
 
         const val META_KEY = "\$meta"
-        const val VERSION_KEY = "version"
-        const val SUMMARY_KEY = "summary"
-        const val DESCRIPTION_KEY = "description"
+        const val VERSION_KEY = "\$version"
+        const val SUMMARY_KEY = "\$summary"
+        const val DESCRIPTION_KEY = "\$description"
     }
 
     data class Group(
@@ -24,6 +24,8 @@ data class Specification(
     )
 
     data class Entry(
+        val summary: String? = null,
+        val description: String? = null,
         val name: String,
         val default: String,
         val translations: Map<String, String>
