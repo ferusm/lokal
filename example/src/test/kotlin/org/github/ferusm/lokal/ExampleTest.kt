@@ -1,11 +1,36 @@
 package org.github.ferusm.lokal
 
+
 import local.schema.test.generating.LoKal
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class ExampleTest {
     @Test
-    fun test() {
-        LoKal.SecondGroup.SomeMessage("test")
+    fun `All phrases should be generated as classes`() {
+        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
+        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+    }
+
+    @Test
+    fun `Locale parameter should control language`() {
+        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
+        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+
+        LoKal.locale = { "ru" }
+
+        assertEquals("Привет, первый товарисч Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
+        assertEquals("Привет, второй товарисч Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+    }
+
+    @Test
+    fun `Default locale should be used if entry don't have proper translation`() {
+        assertEquals("Привет, первый товарисч Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
+        assertEquals("Привет, второй товарисч Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+
+        LoKal.locale = { "jp" }
+
+        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
+        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
     }
 }

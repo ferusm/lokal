@@ -8,10 +8,6 @@
     "firstMessage": {
       "default": "Hello, first comrade {name}",
       "ru": "Привет, первый товарисч {name}"
-    },
-    "secondMessage": {
-      "default": "Hello, second comrade {name}",
-      "ru": "Привет, второй товарисч {name}"
     }
   },
   "secondGroup": {

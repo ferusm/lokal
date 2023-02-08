@@ -1,6 +1,6 @@
 plugins {
-    id("loKal")
     kotlin("jvm") version "1.8.0"
+    id("loKal")
 }
 
 repositories {
@@ -16,16 +16,10 @@ dependencies {
 }
 
 loKal {
+    sourceSet = kotlin.sourceSets["main"]
     register {
-        inputFilePath = "translations/first.json"
-        outputPackage = "local.schema.test.generating"
-    }
-}
-
-tasks.named("compileKotlin") { dependsOn("loKal") }
-
-kotlin.sourceSets["main"].kotlin {
-    loKal {
-        srcDir(defaultOutputDir)
+        input = projectDir.resolve("translations/first.json")
+        pack = "local.schema.test.generating"
+        output = buildDir.resolve("generated/main/kotlin")
     }
 }

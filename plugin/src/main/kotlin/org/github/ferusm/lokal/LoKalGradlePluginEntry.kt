@@ -1,20 +1,18 @@
 package org.github.ferusm.lokal
 
+import java.io.File
+
 
 class LoKalGradlePluginEntry {
-    lateinit var inputFilePath: String
-    lateinit var outputPackage: String
-    lateinit var outputDirPath: String
+    lateinit var input: File
+    lateinit var pack: String
 
-    fun validate(defaultOutputDir: String) {
-        if (!this::inputFilePath.isInitialized) {
-            throw IllegalStateException("${this::inputFilePath.name} property must be initialized")
+    fun validate() {
+        if (!this::input.isInitialized) {
+            throw IllegalStateException("${this::input.name} property must be initialized")
         }
-        if (!this::outputPackage.isInitialized) {
-            throw IllegalStateException("${this::outputPackage.name} property must be initialized")
-        }
-        if (!this::outputDirPath.isInitialized) {
-            outputDirPath = defaultOutputDir
+        if (!this::pack.isInitialized) {
+            throw IllegalStateException("${this::pack.name} property must be initialized")
         }
     }
 }
