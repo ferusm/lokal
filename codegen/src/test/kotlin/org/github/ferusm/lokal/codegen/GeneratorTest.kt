@@ -15,7 +15,7 @@ class GeneratorTest {
             import kotlin.String
 
             public object LoKal {
-              public var locale: () -> String = {"default"}
+              public var locale: () -> String = { "default" }
             }
 
         """.trimIndent(), fileSpec.asText()
@@ -70,17 +70,9 @@ class GeneratorTest {
               public var locale: () -> String = { "default" }
             
               public object Http {
-                public val statusMessage: StatusMessage
-                  get() = StatusMessage()
-            
-                public class StatusMessage {
-                  private var comrade: String = "undefined"
-            
-                  public fun comrade(comrade: String): StatusMessage {
-                    this.comrade = comrade
-                    return this
-                  }
-            
+                public data class StatusMessage(
+                  public val comrade: String,
+                ) {
                   public override fun toString(): String = when(LoKal.locale()) {
                     "ru" -> "Привет, ${"$"}{comrade}"
                     else -> "Hello, ${"$"}{comrade}"

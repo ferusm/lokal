@@ -1,0 +1,28 @@
+{
+  "firstGroup": {
+    "$meta": {
+      "$version": "0.1.0-SNAPSHOT",
+      "$summary": "First group",
+      "$description": "First group of texts"
+    },
+    "firstMessage": {
+      "default": "Hello, first comrade {name}",
+      "ru": "Привет, первый товарисч {name}"
+    },
+    "secondMessage": {
+      "default": "Hello, second comrade {name}",
+      "ru": "Привет, второй товарисч {name}"
+    }
+  },
+  "secondGroup": {
+    "$meta": {
+      "$version": "0.1.0-SNAPSHOT",
+      "$summary": "Second group",
+      "$description": "Second group of texts"
+    },
+    "someMessage": {
+      "default": "Hello, second comrade {name}",
+      "ru": "Привет, второй товарисч {name}"
+    }
+  }
+}

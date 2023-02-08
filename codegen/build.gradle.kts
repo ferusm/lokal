@@ -4,8 +4,8 @@ plugins {
 }
 
 dependencies {
-    implementation("com.squareup:kotlinpoet:1.12.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
+    api("com.squareup:kotlinpoet:1.12.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
 
     testImplementation(kotlin("test"))
 }

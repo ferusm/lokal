@@ -15,7 +15,11 @@ object Generator {
 
         LambdaTypeName.get(returnType = Unit::class.asTypeName())
 
-        val rootLocalePropertySpec = PropertySpec.builder("locale", LambdaTypeName.get(returnType = String::class.asTypeName()), KModifier.PUBLIC)
+        val rootLocalePropertySpec = PropertySpec.builder(
+            "locale",
+            LambdaTypeName.get(returnType = String::class.asTypeName()),
+            KModifier.PUBLIC
+        )
             .initializer("""{ "${Specification.DEFAULT_KEY}" }""")
             .mutable(true)
             .build()
@@ -26,59 +30,47 @@ object Generator {
             TypeSpec.objectBuilder(groupTypeClassName).also { groupTypeSpec ->
                 val entryTypeSpecs = group.texts.mapKeys { (key, _) ->
                     groupTypeClassName.nestedClass(key.capitalize())
-                }.mapValues { (key, value) ->
-                     TypeSpec.classBuilder(key).also { entryTypeSpec ->
-                        val entryTypePropertyKeys = value.getTemplateKeys()
-                        val entryTypePropertySpecs = entryTypePropertyKeys.map {
-                            PropertySpec.builder(it, String::class, KModifier.PRIVATE)
-                                .mutable(true)
-                                .initializer(""""undefined"""")
-                                .build()
-                        }
-                        entryTypeSpec.addProperties(entryTypePropertySpecs)
-
-                        val entryTypePropertyFunctions = entryTypePropertySpecs.map {
-                            FunSpec.builder(it.name).addParameter(it.name, it.type)
-                                .returns(key)
-                                .addStatement("this.${it.name} = ${it.name}")
-                                .addStatement("return this")
-                                .build()
-                        }
-                        entryTypeSpec.addFunctions(entryTypePropertyFunctions)
-
-                        val entryTypeToStringFunction = FunSpec.builder("toString")
-                            .returns(String::class)
-                            .addModifiers(KModifier.OVERRIDE)
-                            .beginControlFlow("return when(${rootClassName.simpleName}.${rootLocalePropertySpec.name}())")
-                            .also {
-                                value.translations.forEach { (locale, value) ->
-                                    it.addStatement(""""$locale" -> "${value.replace("{", "\${")}"""")
+                }.map { (key, value) ->
+                    TypeSpec.classBuilder(key)
+                        .addModifiers(KModifier.DATA)
+                        .also { entryTypeSpec ->
+                            val entryTypePropertyKeys = value.getTemplateKeys()
+                            val constructorSpec = FunSpec.constructorBuilder().also {
+                                entryTypePropertyKeys.forEach { propertyKey ->
+                                    it.addParameter(propertyKey, String::class)
                                 }
-                                it.addStatement("""else -> "${value.default.replace("{", "\${")}"""")
-                            }.endControlFlow().build()
-                        entryTypeSpec.addFunction(entryTypeToStringFunction)
+                            }.build()
+                            entryTypeSpec.primaryConstructor(constructorSpec)
 
-                    }.build()
+                            val entryTypePropertySpecs = entryTypePropertyKeys.map {
+                                PropertySpec.builder(it, String::class, KModifier.PUBLIC)
+                                    .initializer(it)
+                                    .build()
+                            }
+                            entryTypeSpec.addProperties(entryTypePropertySpecs)
+
+                            val entryTypeToStringFunction = FunSpec.builder("toString")
+                                .returns(String::class)
+                                .addModifiers(KModifier.OVERRIDE)
+                                .beginControlFlow("return when(${rootClassName.simpleName}.${rootLocalePropertySpec.name}())")
+                                .also {
+                                    value.translations.forEach { (locale, value) ->
+                                        it.addStatement(""""$locale" -> "${value.replace("{", "\${")}"""")
+                                    }
+                                    it.addStatement("""else -> "${value.default.replace("{", "\${")}"""")
+                                }.endControlFlow().build()
+                            entryTypeSpec.addFunction(entryTypeToStringFunction)
+
+                        }.build()
                 }
-                groupTypeSpec.addTypes(entryTypeSpecs.values)
-                val entryTypePropertySpecs = entryTypeSpecs.map { (key, value) ->
-                    val getterFunSpec = FunSpec.getterBuilder()
-                        .addStatement("""return ${value.name}()""")
-                        .build()
-                    PropertySpec.builder(key.simpleName.decapitalize(), key, KModifier.PUBLIC)
-                        .getter(getterFunSpec)
-                        .build()
-                }
-
-                groupTypeSpec.addProperties(entryTypePropertySpecs)
-
+                groupTypeSpec.addTypes(entryTypeSpecs)
             }.build()
         }
         rootTypeSpec.addTypes(groupTypeSpecs)
 
 
 
-        return FileSpec.builder(targetPackage, "${NAME}.kt")
+        return FileSpec.builder(targetPackage, NAME)
             .addType(rootTypeSpec.build())
             .build()
     }
@@ -113,8 +105,6 @@ object Generator {
 }
 
 private fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else "$it" }
-
-private fun String.decapitalize() = replaceFirstChar { if (it.isUpperCase()) it.lowercase(Locale.ENGLISH) else "$it" }
 
 private fun Specification.Entry.getTemplateKeys(): Collection<String> = buildSet {
     val keyBuilder: StringBuilder = StringBuilder()
