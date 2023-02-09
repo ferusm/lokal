@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     api("com.squareup:kotlinpoet:1.12.0")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.14.2")
 
     testImplementation(kotlin("test"))
 }

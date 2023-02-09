@@ -25,7 +25,7 @@ class GeneratorTest {
 
     @Test
     fun `Generator should process single spec without data`() {
-        val specification = Specification(listOf(Specification.Group(name = "http", entries = emptyList())))
+        val specification = Specification(listOf(Specification.Group("http", emptyList())))
         val fileSpec = Generator.generate("org.test.test.test", specification)
         assertEquals(
             """
@@ -48,10 +48,8 @@ class GeneratorTest {
         val specification = Specification(
             listOf(
                 Specification.Group(
-                    name = "http", entries = listOf(
+                    "http", listOf(
                         Specification.Entry(
-                            null,
-                            null,
                             "statusMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")
@@ -93,10 +91,8 @@ class GeneratorTest {
         val specification = Specification(
             listOf(
                 Specification.Group(
-                    name = "http", entries = listOf(
+                    "http", listOf(
                         Specification.Entry(
-                            null,
-                            null,
                             "statusMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")
@@ -104,10 +100,8 @@ class GeneratorTest {
                     )
                 ),
                 Specification.Group(
-                    name = "http", entries = listOf(
+                    "http", listOf(
                         Specification.Entry(
-                            null,
-                            null,
                             "anotherMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")
@@ -126,17 +120,13 @@ class GeneratorTest {
         val specification = Specification(
             listOf(
                 Specification.Group(
-                    name = "http", entries = listOf(
+                    "http", listOf(
                         Specification.Entry(
-                            null,
-                            null,
                             "statusMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")
                         ),
                         Specification.Entry(
-                            null,
-                            null,
                             "statusMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")
@@ -144,10 +134,8 @@ class GeneratorTest {
                     )
                 ),
                 Specification.Group(
-                    name = "rpc", entries = listOf(
+                    "rpc", listOf(
                         Specification.Entry(
-                            null,
-                            null,
                             "statusMessage",
                             "Hello, {comrade}",
                             mapOf("ru" to "Привет, {comrade}")

@@ -4,7 +4,6 @@ import com.squareup.kotlinpoet.*
 import java.util.*
 
 //TODO Add comments from meta data and add meta as properties
-//TODO Change Json to Yaml
 object Generator {
     private const val NAME = "LoKal"
 
