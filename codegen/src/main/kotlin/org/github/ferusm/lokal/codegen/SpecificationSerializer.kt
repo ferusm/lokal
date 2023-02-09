@@ -29,7 +29,7 @@ object SpecificationSerializer : KSerializer<Specification> {
     override fun deserialize(decoder: Decoder): Specification {
         val rootMap = serializer.deserialize(decoder)
         val groups = rootMap.map { (name, group) ->
-            val entries = (group - META_KEY).mapValues { (name, entry) ->
+            val entries = (group - META_KEY).map { (name, entry) ->
                 val summary = entry[SUMMARY_KEY]
                 val description = entry[DESCRIPTION_KEY]
 
@@ -50,12 +50,13 @@ object SpecificationSerializer : KSerializer<Specification> {
 
     override fun serialize(encoder: Encoder, value: Specification) {
         val rootMap = value.groups.associate { group ->
-            val entriesMap = group.texts.mapValues { (_, entry) ->
-                mapOf(
+            val entriesMap = group.entries.associate { entry ->
+                val entryMap = mapOf(
                     SUMMARY_KEY to (entry.summary ?: ""),
                     DESCRIPTION_KEY to (entry.description ?: ""),
                     DEFAULT_KEY to entry.default,
                 ).filterValues(String::isNotEmpty) + entry.translations
+                entry.name to entryMap
             }
             val metaMap = mapOf(
                 VERSION_KEY to (group.version ?: ""),

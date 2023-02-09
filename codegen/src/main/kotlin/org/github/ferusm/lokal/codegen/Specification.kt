@@ -20,7 +20,7 @@ data class Specification(
         val summary: String? = null,
         val description: String? = null,
         val name: String,
-        val texts: Map<String, Entry>
+        val entries: List<Entry>
     )
 
     data class Entry(

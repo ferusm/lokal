@@ -12,13 +12,17 @@ class SpecificationTest {
     fun `Simple spec should be successfully deserialized`() {
         val file = this::class.java.classLoader.getResourceAsStream("simple_specification.json")!!
         val actualSpecification: Specification = Json.decodeFromStream(file)
-        val expectedSpecification = Specification(listOf(
-            Specification.Group(name = "http", texts = mapOf(
-                "someMessage" to Specification.Entry(
-                    null, null, "someMessage", "Hello, comrade", mapOf("ru" to "Привет, товарисч")
+        val expectedSpecification = Specification(
+            listOf(
+                Specification.Group(
+                    name = "http", entries = listOf(
+                        Specification.Entry(
+                            null, null, "someMessage", "Hello, comrade", mapOf("ru" to "Привет, товарисч")
+                        )
+                    )
                 )
-            ))
-        ))
+            )
+        )
         assertEquals(expectedSpecification, actualSpecification)
     }
 }

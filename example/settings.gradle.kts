@@ -1,1 +1,1 @@
-rootProject.name = "loKal"
+rootProject.name = "example"

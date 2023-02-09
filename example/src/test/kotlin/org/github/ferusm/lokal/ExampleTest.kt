@@ -33,4 +33,9 @@ class ExampleTest {
         assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
         assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
     }
+
+    @Test
+    fun `Render method should return same as toString method return`() {
+        assertEquals(LoKal.FirstGroup.FirstMessage("Petr").render(), "${LoKal.FirstGroup.FirstMessage("Petr")}")
+    }
 }

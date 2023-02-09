@@ -3,12 +3,15 @@ package org.github.ferusm.lokal.codegen
 import com.squareup.kotlinpoet.*
 import java.util.*
 
+//TODO Add comments from meta data and add meta as properties
+//TODO Change Json to Yaml
 object Generator {
-    const val NAME = "LoKal"
+    private const val NAME = "LoKal"
 
     fun generate(targetPackage: String, specification: Specification): FileSpec {
         checkGroupDuplications(specification)
         checkEntryDuplications(specification)
+        checkEntryTemplateKeyConsistent(specification)
 
         val rootClassName = ClassName(targetPackage, NAME)
         val rootTypeSpec = TypeSpec.objectBuilder(rootClassName)
@@ -19,8 +22,7 @@ object Generator {
             "locale",
             LambdaTypeName.get(returnType = String::class.asTypeName()),
             KModifier.PUBLIC
-        )
-            .initializer("""{ "${Specification.DEFAULT_KEY}" }""")
+        ).initializer("""{ "${Specification.DEFAULT_KEY}" }""")
             .mutable(true)
             .build()
         rootTypeSpec.addProperty(rootLocalePropertySpec)
@@ -28,13 +30,13 @@ object Generator {
         val groupTypeSpecs = specification.groups.map { group ->
             val groupTypeClassName = rootClassName.nestedClass(group.name.capitalize())
             TypeSpec.objectBuilder(groupTypeClassName).also { groupTypeSpec ->
-                val entryTypeSpecs = group.texts.mapKeys { (key, _) ->
-                    groupTypeClassName.nestedClass(key.capitalize())
-                }.map { (key, value) ->
-                    TypeSpec.classBuilder(key)
+                val entryTypeSpecs = group.entries.map { entry ->
+                    entry to groupTypeClassName.nestedClass(entry.name.capitalize())
+                }.map { (entry, className) ->
+                    TypeSpec.classBuilder(className)
                         .addModifiers(KModifier.DATA)
                         .also { entryTypeSpec ->
-                            val entryTypePropertyKeys = value.getTemplateKeys()
+                            val entryTypePropertyKeys = entry.default.getTemplateKeys()
                             val constructorSpec = FunSpec.constructorBuilder().also {
                                 entryTypePropertyKeys.forEach { propertyKey ->
                                     it.addParameter(propertyKey, String::class)
@@ -49,16 +51,23 @@ object Generator {
                             }
                             entryTypeSpec.addProperties(entryTypePropertySpecs)
 
-                            val entryTypeToStringFunction = FunSpec.builder("toString")
+                            val entryValueParameterSpec = FunSpec.builder("render")
+                                .addModifiers(KModifier.PUBLIC)
                                 .returns(String::class)
-                                .addModifiers(KModifier.OVERRIDE)
                                 .beginControlFlow("return when(${rootClassName.simpleName}.${rootLocalePropertySpec.name}())")
-                                .also {
-                                    value.translations.forEach { (locale, value) ->
-                                        it.addStatement(""""$locale" -> "${value.replace("{", "\${")}"""")
+                                .apply {
+                                    entry.translations.forEach { (locale, value) ->
+                                        addStatement(""""$locale" -> "${value.replace("{", "\${")}"""")
                                     }
-                                    it.addStatement("""else -> "${value.default.replace("{", "\${")}"""")
+                                    addStatement("""else -> "${entry.default.replace("{", "\${")}"""")
                                 }.endControlFlow().build()
+                            entryTypeSpec.addFunction(entryValueParameterSpec)
+
+                            val entryTypeToStringFunction = FunSpec.builder("toString")
+                                .addModifiers(KModifier.OVERRIDE)
+                                .returns(String::class)
+                                .addStatement("return ${entryValueParameterSpec.name}()")
+                                .build()
                             entryTypeSpec.addFunction(entryTypeToStringFunction)
 
                         }.build()
@@ -79,26 +88,41 @@ object Generator {
         val groups = specification.groups.groupBy(Specification.Group::name)
         val duplicatedGroupNames = groups.filterValues { it.size > 1 }.map { it.value.first().name }
         if (duplicatedGroupNames.isNotEmpty()) {
-            throw IllegalArgumentException("Duplicated Groups found: '${duplicatedGroupNames.joinToString(", ")}'")
+            val description = duplicatedGroupNames.joinToString(", ")
+            throw IllegalArgumentException("Every group should have unique name in scope of specification. Invalid groups is: $description")
         }
     }
 
     private fun checkEntryDuplications(specification: Specification) {
-        val groups = specification.groups.groupBy(Specification.Group::name)
-        val duplicatedEntryNames = groups.mapValues { (_, value) ->
-            value.flatMap { it.texts.keys }
-        }.mapValues { (_, value) ->
-            value.groupBy { it }.mapValues { (_, value) -> value.size }
-        }.filterValues {
-            it.values.any { it > 1 }
-        }.mapValues {
-            it.value.keys
-        }.flatMap { (key, value) ->
-            value.map { "$key/$it" }
-        }.joinToString(", ")
+        val groupedEntryNames = specification.groups.associateWith(Specification.Group::entries)
+        val invalidGroupedEntryList = groupedEntryNames.mapValues { (_, entryList) ->
+            val entryNameList = entryList.map(Specification.Entry::name)
+            entryNameList.filter { name -> entryNameList.count { it == name } > 1 }
+        }.filterValues { diff -> diff.isNotEmpty() }
+        if (invalidGroupedEntryList.isNotEmpty()) {
+            val description = invalidGroupedEntryList.flatMap { (group, entryNameList) ->
+                entryNameList.map { entryName -> "${group.name}/$entryName" }
+            }.joinToString(", ")
+            throw IllegalArgumentException("Every entry should have unique name in scope of group. Invalid entries is: $description")
+        }
+    }
 
-        if (duplicatedEntryNames.isNotEmpty()) {
-            throw IllegalArgumentException("Duplicated Entries found: '$duplicatedEntryNames'")
+    private fun checkEntryTemplateKeyConsistent(specification: Specification) {
+        val groupedEntries = specification.groups.associateWith(Specification.Group::entries)
+        val invalidGroupedEntries = groupedEntries.mapValues { (_, entryList) ->
+            entryList.filter { entry ->
+                val defaultKeys = entry.default.getTemplateKeys()
+                entry.translations.any { (_, value) ->
+                    val keys = value.getTemplateKeys()
+                    !defaultKeys.containsAll(keys)
+                }
+            }
+        }.filterValues { it.isNotEmpty() }
+        if (invalidGroupedEntries.isNotEmpty()) {
+            val description = invalidGroupedEntries.flatMap { (group, entryList) ->
+                entryList.map { entry -> "${group.name}/${entry.name}" }
+            }.joinToString(", ")
+            throw IllegalArgumentException("Every translation should have same template keys as is default translation use. Invalid entries is: $description")
         }
     }
 
@@ -106,25 +130,27 @@ object Generator {
 
 private fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else "$it" }
 
-private fun Specification.Entry.getTemplateKeys(): Collection<String> = buildSet {
+private fun String.getTemplateKeys(): Set<String> {
+    val result = mutableSetOf<String>()
     val keyBuilder: StringBuilder = StringBuilder()
-    default.forEach {
+    forEach {
         when {
             it == '{' -> {
                 keyBuilder.append(' ')
             }
 
             it == '}' -> {
-                add("${keyBuilder.trimStart()}")
+                result.add("${keyBuilder.trimStart()}")
                 keyBuilder.clear()
             }
 
             keyBuilder.isNotEmpty() -> {
                 if (!it.isLetter()) {
-                    throw IllegalArgumentException("Unsupported value of template key of $name entry")
+                    throw IllegalArgumentException("Unsupported value of template key of $this entry")
                 }
                 keyBuilder.append(it)
             }
         }
     }
+    return result.toSet()
 }
