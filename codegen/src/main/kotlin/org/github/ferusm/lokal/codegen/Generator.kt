@@ -3,7 +3,6 @@ package org.github.ferusm.lokal.codegen
 import com.squareup.kotlinpoet.*
 import java.util.*
 
-//TODO Add comments from meta data and add meta as properties
 object Generator {
     private const val NAME = "LoKal"
 
@@ -69,14 +68,15 @@ object Generator {
                                 .build()
                             entryTypeSpec.addFunction(entryTypeToStringFunction)
 
+                            entryTypeSpec.addKdoc(entry.metas.toDocCodeBlock())
                         }.build()
                 }
                 groupTypeSpec.addTypes(entryTypeSpecs)
+                groupTypeSpec.addKdoc(group.metas.toDocCodeBlock())
             }.build()
         }
         rootTypeSpec.addTypes(groupTypeSpecs)
-
-
+        rootTypeSpec.addKdoc(specification.metas.toDocCodeBlock())
 
         return FileSpec.builder(targetPackage, NAME)
             .addType(rootTypeSpec.build())
@@ -126,6 +126,12 @@ object Generator {
     }
 
 }
+
+private fun Map<String, String>.toDocCodeBlock(): CodeBlock = CodeBlock.builder().apply {
+    forEach { (key, value) ->
+        addStatement("${key.capitalize()} - $value")
+    }
+}.build()
 
 private fun String.capitalize() = replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.ENGLISH) else "$it" }
 

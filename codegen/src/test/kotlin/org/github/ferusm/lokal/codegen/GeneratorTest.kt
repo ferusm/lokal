@@ -52,29 +52,41 @@ class GeneratorTest {
                         Specification.Entry(
                             "statusMessage",
                             "Hello, {comrade}",
-                            mapOf("ru" to "Привет, {comrade}")
+                            mapOf("ru" to "Привет, {comrade}"),
+                            mapOf("summary" to "Entry summary")
                         )
-                    )
+                    ),
+                    mapOf("summary" to "Group summary")
                 )
-            )
+            ),
+            mapOf("summary" to "Root summary")
         )
         val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals(
             """
             package org.test.test
-            
+
             import kotlin.String
             
+            /**
+             * Summary - Root summary
+             */
             public object LoKal {
               public var locale: () -> String = { "default" }
             
+              /**
+               * Summary - Group summary
+               */
               public object Http {
+                /**
+                 * Summary - Entry summary
+                 */
                 public data class StatusMessage(
                   public val comrade: String,
                 ) {
                   public fun render(): String = when(LoKal.locale()) {
-                    "ru" -> "Привет, ${"$"}{comrade}"
-                    else -> "Hello, ${"$"}{comrade}"
+                    "ru" -> "Привет, ${'$'}{comrade}"
+                    else -> "Hello, ${'$'}{comrade}"
                   }
             
                   public override fun toString(): String = render()
