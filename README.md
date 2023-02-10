@@ -12,6 +12,9 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io") {
+        name = "JitPack"
+    }
 }
 
 loKal {
@@ -20,6 +23,20 @@ loKal {
         input = projectDir.resolve("translations/specification.yaml")
         pack = "local.schema.test.generating"
         output = buildDir.resolve("generated/main/kotlin")
+    }
+}
+```
+
+settings.gradle.kts
+```kotlin
+rootProject.name = "example"
+
+pluginManagement {
+    repositories {
+        mavenCentral()
+        maven("https://jitpack.io") {
+            name = "JitPack"
+        }
     }
 }
 ```

@@ -1,5 +1,3 @@
-import java.net.URI
-
 plugins {
     `maven-publish`
     kotlin("jvm") version "1.8.0"
@@ -23,8 +21,8 @@ publishing {
     }
     publishing {
         repositories {
-            maven {
-                url = URI.create("https://maven.pkg.github.com/ferusm/loKal")
+            maven("https://maven.pkg.github.com/ferusm/loKal") {
+                name = "GitHub"
                 credentials {
                     username = project.property("github.auth.user") as String
                     password = project.property("github.auth.token") as String

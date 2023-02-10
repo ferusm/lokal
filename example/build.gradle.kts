@@ -7,8 +7,8 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        url = URI.create("https://maven.pkg.github.com/ferusm/loKal")
+    maven("https://jitpack.io") {
+        name = "JitPack"
     }
 }
 

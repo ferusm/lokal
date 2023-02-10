@@ -1,5 +1,3 @@
-import java.net.URI
-
 plugins {
     `java-gradle-plugin`
     `maven-publish`
@@ -14,7 +12,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("loKal") {
-            id = "io.github.ferusm.loKal"
+            id = "io.github.ferusm.lokal"
             displayName = "loKal"
             description = "Compile-time localization tool for Kotlin"
             implementationClass = "io.github.ferusm.lokal.LoKalGradlePlugin"
@@ -22,15 +20,14 @@ gradlePlugin {
     }
 }
 
+
 publishing {
-    publishing {
-        repositories {
-            maven {
-                url = URI.create("https://maven.pkg.github.com/ferusm/loKal")
-                credentials {
-                    username = project.property("github.auth.user") as String
-                    password = project.property("github.auth.token") as String
-                }
+    repositories {
+        maven("https://maven.pkg.github.com/ferusm/loKal") {
+            name = "GitHub"
+            credentials {
+                username = project.property("github.auth.user") as String
+                password = project.property("github.auth.token") as String
             }
         }
     }
