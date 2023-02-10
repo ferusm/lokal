@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal.codegen
+package io.github.ferusm.lokal.codegen
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -9,9 +9,11 @@ class ReaderTest {
         val stream = this::class.java.classLoader.getResourceAsStream("simple_specification.yaml")!!
         val actualSpecification = Reader.read(stream)
         val expectedSpecification = Specification(
-            listOf(Specification.Group(
+            listOf(
+                Specification.Group(
                 "http",
-                listOf(Specification.Entry(
+                listOf(
+                    Specification.Entry(
                     "message",
                     "Hello, comrade {name}",
                     mapOf("ru" to "Привет, товарисч {name}"),

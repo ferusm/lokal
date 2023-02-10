@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal.codegen
+package io.github.ferusm.lokal.codegen
 
 data class Specification(
     val groups: List<Group> = emptyList(),

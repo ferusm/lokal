@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal.codegen
+package io.github.ferusm.lokal.codegen
 
 import com.squareup.kotlinpoet.FileSpec
 import kotlin.test.Test

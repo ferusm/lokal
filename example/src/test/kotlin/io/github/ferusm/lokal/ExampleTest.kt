@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal
+package io.github.ferusm.lokal
 
 
 import local.schema.test.generating.LoKal

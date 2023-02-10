@@ -7,7 +7,7 @@ build.gradle.kts
 ```kotlin
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("loKal")
+    id("io.github.ferusm.lokal") version "0.1.0-SNAPSHOT"
 }
 
 repositories {

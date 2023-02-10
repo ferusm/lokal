@@ -5,8 +5,8 @@ plugins {
 }
 
 allprojects {
-    group = "org.github.ferusm.lokal"
-    version = "0.1.0"
+    group = "io.github.ferusm.lokal"
+    version = "0.1.0-SNAPSHOT"
 
     repositories {
         mavenCentral()
@@ -15,4 +15,6 @@ allprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
     }
+
+
 }

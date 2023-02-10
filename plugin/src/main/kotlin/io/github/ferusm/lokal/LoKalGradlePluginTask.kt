@@ -1,8 +1,8 @@
-package org.github.ferusm.lokal
+package io.github.ferusm.lokal
 
-import org.github.ferusm.lokal.codegen.Generator
-import org.github.ferusm.lokal.codegen.Reader
-import org.github.ferusm.lokal.codegen.Specification
+import io.github.ferusm.lokal.codegen.Generator
+import io.github.ferusm.lokal.codegen.Reader
+import io.github.ferusm.lokal.codegen.Specification
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory

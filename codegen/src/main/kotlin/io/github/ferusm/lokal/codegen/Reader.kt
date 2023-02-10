@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal.codegen
+package io.github.ferusm.lokal.codegen
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -59,4 +59,3 @@ private fun JsonNode.parseMetas(): Map<String, String> {
         name.removePrefix(Specification.META_PREFIX) to node.asText()
     }.toMap()
 }
-

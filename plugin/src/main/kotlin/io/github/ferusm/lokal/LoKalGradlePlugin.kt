@@ -1,4 +1,4 @@
-package org.github.ferusm.lokal
+package io.github.ferusm.lokal
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
