@@ -1,6 +1,5 @@
 plugins {
     `java-gradle-plugin`
-    `maven-publish`
     kotlin("jvm") version "1.8.0"
 }
 
@@ -16,19 +15,6 @@ gradlePlugin {
             displayName = "loKal"
             description = "Compile-time localization tool for Kotlin"
             implementationClass = "io.github.ferusm.lokal.LoKalGradlePlugin"
-        }
-    }
-}
-
-
-publishing {
-    repositories {
-        maven("https://maven.pkg.github.com/ferusm/loKal") {
-            name = "GitHub"
-            credentials {
-                username = project.property("github.auth.user") as String
-                password = project.property("github.auth.token") as String
-            }
         }
     }
 }
