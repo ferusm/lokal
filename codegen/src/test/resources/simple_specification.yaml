@@ -1,0 +1,12 @@
+$version: 0.1.0
+$summary: Text entries
+$description: Status messages and etc.
+http:
+  $version: 0.1.0
+  $summary: Http text entries
+  $description: Http status messages and etc.
+  message:
+    $summary: Basic message
+    $description: Basic message for test porpoises
+    default: Hello, comrade {name}
+    ru: Привет, товарисч {name}
