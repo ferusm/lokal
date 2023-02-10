@@ -1,6 +1,6 @@
 # loKal
 
-[![](https://jitpack.io/v/ferusm/loKal.svg)](https://jitpack.io/#ferusm/loKal)
+[![](https://jitpack.io/v/ferusm/lokal.svg)](https://jitpack.io/#ferusm/lokal)
 
 This is compile-time localization tool for Kotlin
 
