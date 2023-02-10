@@ -1,3 +1,5 @@
+import java.net.URI
+
 plugins {
     kotlin("jvm") version "1.8.0"
     id("io.github.ferusm.lokal") version "0.1.0-SNAPSHOT"
@@ -5,6 +7,9 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven {
+        url = URI.create("https://maven.pkg.github.com/ferusm/loKal")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
