@@ -22,11 +22,9 @@ repositories {
 
 loKal {
     sourceSet = kotlin.sourceSets["main"]
-    register {
-        input = projectDir.resolve("translations/specification.yaml")
-        pack = "local.schema.test.generating"
-        output = buildDir.resolve("generated/main/kotlin")
-    }
+    input = projectDir.resolve("translations/specification.yaml")
+    pack = "local.schema.test.generating"
+    output = buildDir.resolve("generated/main/kotlin")
 }
 ```
 
