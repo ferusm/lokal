@@ -6,5 +6,6 @@ pluginManagement {
         maven("https://jitpack.io") {
             name = "JitPack"
         }
+        mavenLocal()
     }
 }
