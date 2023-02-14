@@ -10,6 +10,10 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven("https://jitpack.io") {
+            name = "JitPack"
+        }
+        mavenLocal()
     }
 
     tasks.withType<KotlinCompile> {
