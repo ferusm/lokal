@@ -31,23 +31,24 @@ object Generator {
                 val entryTypeSpecs = group.entries.map { entry ->
                     entry to groupTypeClassName.nestedClass(entry.name.capitalize())
                 }.map { (entry, className) ->
-                    TypeSpec.classBuilder(className)
-                        .addModifiers(KModifier.DATA)
+                    val entryTypeSpec = TypeSpec.classBuilder(className)
                         .also { entryTypeSpec ->
                             val entryTypePropertyKeys = entry.default.getTemplateKeys()
-                            val constructorSpec = FunSpec.constructorBuilder().also {
-                                entryTypePropertyKeys.forEach { propertyKey ->
-                                    it.addParameter(propertyKey, String::class)
-                                }
-                            }.build()
-                            entryTypeSpec.primaryConstructor(constructorSpec)
+                            if (entryTypePropertyKeys.isNotEmpty()) {
+                                val constructorSpec = FunSpec.constructorBuilder().also {
+                                    entryTypePropertyKeys.forEach { propertyKey ->
+                                        it.addParameter(propertyKey, String::class)
+                                    }
+                                }.build()
+                                entryTypeSpec.primaryConstructor(constructorSpec)
 
-                            val entryTypePropertySpecs = entryTypePropertyKeys.map {
-                                PropertySpec.builder(it, String::class, KModifier.PUBLIC)
-                                    .initializer(it)
-                                    .build()
+                                val entryTypePropertySpecs = entryTypePropertyKeys.map {
+                                    PropertySpec.builder(it, String::class, KModifier.PUBLIC)
+                                        .initializer(it)
+                                        .build()
+                                }
+                                entryTypeSpec.addProperties(entryTypePropertySpecs)
                             }
-                            entryTypeSpec.addProperties(entryTypePropertySpecs)
 
                             val entryValueParameterSpec = FunSpec.builder("render")
                                 .addModifiers(KModifier.PUBLIC)
@@ -69,7 +70,12 @@ object Generator {
                             entryTypeSpec.addFunction(entryTypeToStringFunction)
 
                             entryTypeSpec.addKdoc(entry.metas.toDocCodeBlock())
-                        }.build()
+                        }
+                    val isTypeDataClass = entryTypeSpec.propertySpecs.size > 0
+                    if (isTypeDataClass) {
+                        entryTypeSpec.addModifiers(KModifier.DATA)
+                    }
+                    entryTypeSpec.build()
                 }
                 groupTypeSpec.addTypes(entryTypeSpecs)
                 groupTypeSpec.addKdoc(group.metas.toDocCodeBlock())

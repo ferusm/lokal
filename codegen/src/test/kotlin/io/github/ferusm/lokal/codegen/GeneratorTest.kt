@@ -163,6 +163,59 @@ class GeneratorTest {
 
     @Test
     fun `Generator should throw an exception if translation has not the same template keys as default translation has`() {
+        val specification = Specification(
+            listOf(
+                Specification.Group(
+                    "http", listOf(
+                        Specification.Entry(
+                            "statusMessage",
+                            "Hello, {comrade}",
+                            mapOf("ru" to "Привет, {name}")
+                        )
+                    )
+                )
+            )
+        )
+        assertFails {
+            Generator.generate("org.test.test", specification)
+        }
+    }
+
+    @Test
+    fun `Generator should product data class if translation has at least one template key`() {
+        val specification = Specification(
+            listOf(
+                Specification.Group(
+                    "http", listOf(
+                        Specification.Entry(
+                            "statusMessage",
+                            "Hello, comrade"
+                        )
+                    )
+                )
+            )
+        )
+        val fileSpec = Generator.generate("org.test.test", specification)
+        assertEquals("""
+        package org.test.test
+        
+        import kotlin.String
+        
+        public object LoKal {
+          public var locale: () -> String = { "default" }
+        
+          public object Http {
+            public class StatusMessage {
+              public fun render(): String = when(LoKal.locale()) {
+                else -> "Hello, comrade"
+              }
+        
+              public override fun toString(): String = render()
+            }
+          }
+        }
+
+        """.trimIndent(), fileSpec.asText())
 
     }
 
