@@ -1,7 +1,7 @@
 package io.github.ferusm.lokal.codegen
 
 data class Specification(
-    val groups: List<Group> = emptyList(),
+    val items: List<Item> = emptyList(),
     val metas: Map<String, String> = emptyMap()
 ) {
     companion object {
@@ -9,16 +9,18 @@ data class Specification(
         const val META_PREFIX = "\$"
     }
 
+    sealed interface Item
+
     data class Group(
         val name: String,
-        val entries: List<Entry> = emptyList(),
+        val items: List<Item> = emptyList(),
         val metas: Map<String, String> = emptyMap()
-    )
+    ): Item
 
     data class Entry(
         val name: String,
         val default: String,
         val translations: Map<String, String> = emptyMap(),
         val metas: Map<String, String> = emptyMap()
-    )
+    ): Item
 }

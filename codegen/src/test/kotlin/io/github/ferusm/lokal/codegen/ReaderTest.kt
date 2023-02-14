@@ -10,10 +10,7 @@ class ReaderTest {
         val actualSpecification = Reader.read(stream)
         val expectedSpecification = Specification(
             listOf(
-                Specification.Group(
-                "http",
-                listOf(
-                    Specification.Entry(
+                Specification.Entry(
                     "message",
                     "Hello, comrade {name}",
                     mapOf("ru" to "Привет, товарисч {name}"),
@@ -21,15 +18,47 @@ class ReaderTest {
                         "summary" to "Basic message",
                         "description" to "Basic message for test porpoises"
                     )
-                )),
-                mapOf(
-                    "version" to "0.3.0",
-                    "summary" to "Http text entries",
-                    "description" to "Http status messages and etc."
+                ),
+                Specification.Group(
+                    "http",
+                    listOf(
+                        Specification.Entry(
+                            "message",
+                            "Hello, comrade {name}",
+                            mapOf("ru" to "Привет, товарисч {name}"),
+                            mapOf(
+                                "summary" to "Basic message",
+                                "description" to "Basic message for test porpoises"
+                            )
+                        ), Specification.Group(
+                            "http",
+                            listOf(
+                                Specification.Entry(
+                                    "message",
+                                    "Hello, comrade {name}",
+                                    mapOf("ru" to "Привет, товарисч {name}"),
+                                    mapOf(
+                                        "summary" to "Basic message",
+                                        "description" to "Basic message for test porpoises"
+                                    )
+                                )
+                            ),
+                            mapOf(
+                                "version" to "0.4.0",
+                                "summary" to "Http text entries",
+                                "description" to "Http status messages and etc."
+                            )
+                        )
+                    ),
+                    mapOf(
+                        "version" to "0.4.0",
+                        "summary" to "Http text entries",
+                        "description" to "Http status messages and etc."
+                    )
                 )
-            )),
+            ),
             mapOf(
-                "version" to "0.3.0",
+                "version" to "0.4.0",
                 "summary" to "Text entries",
                 "description" to "Status messages and etc."
             )

@@ -32,7 +32,7 @@ class GeneratorTest {
             package org.test.test.test
 
             import kotlin.String
-            
+
             public object LoKal {
               public var locale: () -> String = { "~" }
 
@@ -67,13 +67,13 @@ class GeneratorTest {
             package org.test.test
 
             import kotlin.String
-            
+
             /**
              * Summary - Root summary
              */
             public object LoKal {
               public var locale: () -> String = { "~" }
-            
+
               /**
                * Summary - Group summary
                */
@@ -88,7 +88,7 @@ class GeneratorTest {
                     "ru" -> "Привет, ${'$'}{comrade}"
                     else -> "Hello, ${'$'}{comrade}"
                   }
-            
+
                   public override fun toString(): String = render()
                 }
               }
@@ -198,25 +198,91 @@ class GeneratorTest {
         val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals("""
         package org.test.test
-        
+
         import kotlin.String
-        
+
         public object LoKal {
           public var locale: () -> String = { "~" }
-        
+
           public object Http {
             public class StatusMessage {
               public fun render(): String = when(LoKal.locale()) {
                 else -> "Hello, comrade"
               }
-        
+
               public override fun toString(): String = render()
             }
           }
         }
 
         """.trimIndent(), fileSpec.asText())
+    }
 
+    @Test
+    fun `Generator should produce multi-level object hierarchy`() {
+        val specification = Specification(
+            listOf(
+                Specification.Group(
+                    "http", listOf(
+                        Specification.Entry(
+                            "groupMessage",
+                            "Hello from group message"
+                        ),
+                        Specification.Group(
+                            "error", listOf(
+                                Specification.Entry(
+                                    "groupInGroupMessage",
+                                    "Hello from group in group message"
+                                )
+                            )
+                        )
+                    )
+                ),
+                Specification.Entry(
+                    "rootMessage",
+                    "Hello from root message"
+                )
+            )
+        )
+        val fileSpec = Generator.generate("org.test.test", specification)
+        assertEquals("""
+        package org.test.test
+
+        import kotlin.String
+        
+        public object LoKal {
+          public var locale: () -> String = { "~" }
+        
+          public object Http {
+            public class GroupMessage {
+              public fun render(): String = when(LoKal.locale()) {
+                else -> "Hello from group message"
+              }
+        
+              public override fun toString(): String = render()
+            }
+        
+            public object Error {
+              public class GroupInGroupMessage {
+                public fun render(): String = when(LoKal.locale()) {
+                  else -> "Hello from group in group message"
+                }
+        
+                public override fun toString(): String = render()
+              }
+            }
+          }
+        
+          public class RootMessage {
+            public fun render(): String = when(LoKal.locale()) {
+              else -> "Hello from root message"
+            }
+        
+            public override fun toString(): String = render()
+          }
+        }
+
+        """.trimIndent(), fileSpec.asText())
     }
 
     private fun FileSpec.asText(): String = StringBuilder().also { writeTo(it) }.toString()

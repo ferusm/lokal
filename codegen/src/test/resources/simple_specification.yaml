@@ -1,8 +1,13 @@
-$version: 0.3.0
+$version: 0.4.0
 $summary: Text entries
 $description: Status messages and etc.
+message:
+  $summary: Basic message
+  $description: Basic message for test porpoises
+  ~: Hello, comrade {name}
+  ru: Привет, товарисч {name}
 http:
-  $version: 0.3.0
+  $version: 0.4.0
   $summary: Http text entries
   $description: Http status messages and etc.
   message:
@@ -10,3 +15,12 @@ http:
     $description: Basic message for test porpoises
     ~: Hello, comrade {name}
     ru: Привет, товарисч {name}
+  http:
+    $version: 0.4.0
+    $summary: Http text entries
+    $description: Http status messages and etc.
+    message:
+      $summary: Basic message
+      $description: Basic message for test porpoises
+      ~: Hello, comrade {name}
+      ru: Привет, товарисч {name}
