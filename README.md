@@ -10,7 +10,7 @@ build.gradle.kts
 ```kotlin
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("io.github.ferusm.lokal") version "0.4.0"
+    id("io.github.ferusm.lokal") version "0.5.0"
 }
 
 repositories {
@@ -44,7 +44,7 @@ pluginManagement {
 
 translations/specification.yaml
 ```yaml
-$version: 0.4.0
+$version: 0.5.0
 $summary: Text entries
 $description: Status messages and etc.
 message:
@@ -53,7 +53,7 @@ message:
   ~: Hello, comrade {name}
   ru: Привет, товарисч {name}
 http:
-  $version: 0.4.0
+  $version: 0.5.0
   $summary: Http text entries
   $description: Http status messages and etc.
   message:
@@ -62,7 +62,7 @@ http:
     ~: Hello, comrade {name}
     ru: Привет, товарисч {name}
   http:
-    $version: 0.4.0
+    $version: 0.5.0
     $summary: Http text entries
     $description: Http status messages and etc.
     message:

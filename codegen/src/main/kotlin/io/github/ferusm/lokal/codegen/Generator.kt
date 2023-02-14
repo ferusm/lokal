@@ -65,13 +65,13 @@ object Generator {
         if (defaultTemplateKeys.isNotEmpty()) {
             val constructorSpec = FunSpec.constructorBuilder().also {
                 defaultTemplateKeys.forEach { propertyKey ->
-                    it.addParameter(propertyKey, String::class)
+                    it.addParameter(propertyKey, Any::class)
                 }
             }.build()
             specBuilder.primaryConstructor(constructorSpec)
 
             val entryTypePropertySpecs = defaultTemplateKeys.map {
-                PropertySpec.builder(it, String::class, KModifier.PUBLIC)
+                PropertySpec.builder(it, Any::class, KModifier.PUBLIC)
                     .initializer(it)
                     .build()
             }

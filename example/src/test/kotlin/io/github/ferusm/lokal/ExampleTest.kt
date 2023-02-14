@@ -32,11 +32,15 @@ class ExampleTest {
 
         assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
         assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
-        LoKal
     }
 
     @Test
     fun `Render method should return same as toString method return`() {
         assertEquals(LoKal.FirstGroup.FirstMessage("Petr").render(), "${LoKal.FirstGroup.FirstMessage("Petr")}")
+    }
+
+    @Test
+    fun `Template constructor should apply Kotlin Any parameters`() {
+        assertEquals("Hello, second comrade 1", "${LoKal.SecondGroup.SomeMessage(1)}")
     }
 }

@@ -66,14 +66,15 @@ class GeneratorTest {
             """
             package org.test.test
 
+            import kotlin.Any
             import kotlin.String
-
+            
             /**
              * Summary - Root summary
              */
             public object LoKal {
               public var locale: () -> String = { "~" }
-
+            
               /**
                * Summary - Group summary
                */
@@ -82,13 +83,13 @@ class GeneratorTest {
                  * Summary - Entry summary
                  */
                 public data class StatusMessage(
-                  public val comrade: String,
+                  public val comrade: Any,
                 ) {
                   public fun render(): String = when(LoKal.locale()) {
-                    "ru" -> "Привет, ${'$'}{comrade}"
-                    else -> "Hello, ${'$'}{comrade}"
+                    "ru" -> "Привет, ${"$"}{comrade}"
+                    else -> "Hello, ${"$"}{comrade}"
                   }
-
+            
                   public override fun toString(): String = render()
                 }
               }
