@@ -45,30 +45,31 @@ pluginManagement {
 translations/specification.yaml
 ```yaml
 $version: 0.4.0
-$summary: Example project text specification
-$description: For test porpoise
-
-firstGroup:
-  $summary: Example project text group
-  $description: For test porpoise
-
-  firstMessage:
-    $summary: Example project text
-    $description: For test porpoise
-
-    default: Hello, first comrade {name}
-    ru: Привет, первый товарисч {name}
-
-secondGroup:
-  $summary: Another example project text group
-  $description: For test porpoise
-
-  someMessage:
-    $summary: Another example project text
-    $description: For test porpoise
-
-    default: Hello, second comrade {name}
-    ru: Привет, второй товарисч {name}
+$summary: Text entries
+$description: Status messages and etc.
+message:
+  $summary: Basic message
+  $description: Basic message for test porpoises
+  ~: Hello, comrade {name}
+  ru: Привет, товарисч {name}
+http:
+  $version: 0.4.0
+  $summary: Http text entries
+  $description: Http status messages and etc.
+  message:
+    $summary: Basic message
+    $description: Basic message for test porpoises
+    ~: Hello, comrade {name}
+    ru: Привет, товарисч {name}
+  http:
+    $version: 0.4.0
+    $summary: Http text entries
+    $description: Http status messages and etc.
+    message:
+      $summary: Basic message
+      $description: Basic message for test porpoises
+      ~: Hello, comrade {name}
+      ru: Привет, товарисч {name}
 
 ```
 
