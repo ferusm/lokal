@@ -44,21 +44,21 @@ class ReaderTest {
                                 )
                             ),
                             mapOf(
-                                "version" to "0.5.0",
+                                "version" to "0.5.1",
                                 "summary" to "Http text entries",
                                 "description" to "Http status messages and etc."
                             )
                         )
                     ),
                     mapOf(
-                        "version" to "0.5.0",
+                        "version" to "0.5.1",
                         "summary" to "Http text entries",
                         "description" to "Http status messages and etc."
                     )
                 )
             ),
             mapOf(
-                "version" to "0.5.0",
+                "version" to "0.5.1",
                 "summary" to "Text entries",
                 "description" to "Status messages and etc."
             )

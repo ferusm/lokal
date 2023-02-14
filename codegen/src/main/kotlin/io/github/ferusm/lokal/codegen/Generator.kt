@@ -16,12 +16,12 @@ object Generator {
             "locale",
             LambdaTypeName.get(returnType = String::class.asTypeName()),
             KModifier.PUBLIC
-        ).initializer("""{ "${Specification.DEFAULT_KEY}" }""")
+        ).initializer("{ %S }", Specification.DEFAULT_KEY)
             .mutable(true)
             .build()
         rootTypeSpec.addProperty(rootLocalePropertySpec)
 
-        val types = specification.items.map(::processItem).checkDuplications(rootTypeSpec)
+        val types = specification.items.map { processItem(rootLocalePropertySpec, it) }.checkDuplications(rootTypeSpec)
 
         rootTypeSpec.addTypes(types)
         rootTypeSpec.addKdoc(specification.metas.toDocCodeBlock())
@@ -31,15 +31,15 @@ object Generator {
             .build()
     }
 
-    private fun processItem(item: Specification.Item): TypeSpec = when (item) {
-        is Specification.Entry -> processEntry(item)
-        is Specification.Group -> processGroup(item)
+    private fun processItem(localeSpec: PropertySpec, item: Specification.Item): TypeSpec = when (item) {
+        is Specification.Entry -> processEntry(localeSpec, item)
+        is Specification.Group -> processGroup(localeSpec, item)
     }
 
-    private fun processGroup(group: Specification.Group): TypeSpec {
+    private fun processGroup(localeSpec: PropertySpec, group: Specification.Group): TypeSpec {
         val specBuilder = TypeSpec.objectBuilder(group.name.capitalize())
 
-        val types = group.items.map(::processItem).checkDuplications(specBuilder)
+        val types = group.items.map { processItem(localeSpec, it) }.checkDuplications(specBuilder)
 
         specBuilder.addTypes(types)
         specBuilder.addKdoc(group.metas.toDocCodeBlock())
@@ -48,8 +48,8 @@ object Generator {
     }
 
     private fun List<TypeSpec>.checkDuplications(typeSpecBuilder: TypeSpec.Builder): List<TypeSpec> {
-        return onEach {  child ->
-            if (typeSpecBuilder.typeSpecs.any { it.name == child.name}) {
+        return onEach { child ->
+            if (typeSpecBuilder.typeSpecs.any { it.name == child.name }) {
                 throw IllegalArgumentException("Illegal item duplicate ${child.name}")
             }
             if (count { it.name == child.name } > 1) {
@@ -58,7 +58,7 @@ object Generator {
         }
     }
 
-    private fun processEntry(entry: Specification.Entry): TypeSpec {
+    private fun processEntry(localeSpec: PropertySpec, entry: Specification.Entry): TypeSpec {
         val specBuilder = TypeSpec.classBuilder(entry.name.capitalize())
 
         val defaultTemplateKeys = entry.default.getTemplateKeys()
@@ -81,7 +81,7 @@ object Generator {
         val entryValueParameterSpec = FunSpec.builder("render")
             .addModifiers(KModifier.PUBLIC)
             .returns(String::class)
-            .beginControlFlow("return when($NAME.locale())")
+            .beginControlFlow("return when(%N())", localeSpec)
             .apply {
                 entry.translations.onEach { (name, value) ->
                     val templateKeys = value.getTemplateKeys()
@@ -89,16 +89,16 @@ object Generator {
                         throw IllegalArgumentException("Unexpected template keys in $name entry. Template keys in each translation must be the same as in default translation")
                     }
                 }.forEach { (locale, value) ->
-                    addStatement(""""$locale" -> "${value.replace("{", "\${")}"""")
+                    addStatement("%S -> %P", locale, value.replace("{", "\${"))
                 }
-                addStatement("""else -> "${entry.default.replace("{", "\${")}"""")
+                addStatement("else -> %P", entry.default.replace("{", "\${"))
             }.endControlFlow().build()
         specBuilder.addFunction(entryValueParameterSpec)
 
         val entryTypeToStringFunction = FunSpec.builder("toString")
             .addModifiers(KModifier.OVERRIDE)
             .returns(String::class)
-            .addStatement("return ${entryValueParameterSpec.name}()")
+            .addStatement("return %N()", entryValueParameterSpec)
             .build()
 
         specBuilder.addFunction(entryTypeToStringFunction)

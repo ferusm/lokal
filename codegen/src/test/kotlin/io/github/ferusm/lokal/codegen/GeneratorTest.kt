@@ -65,7 +65,7 @@ class GeneratorTest {
         assertEquals(
             """
             package org.test.test
-
+            
             import kotlin.Any
             import kotlin.String
             
@@ -85,9 +85,9 @@ class GeneratorTest {
                 public data class StatusMessage(
                   public val comrade: Any,
                 ) {
-                  public fun render(): String = when(LoKal.locale()) {
-                    "ru" -> "Привет, ${"$"}{comrade}"
-                    else -> "Hello, ${"$"}{comrade}"
+                  public fun render(): String = when(locale()) {
+                    "ru" -> ""${'"'}Привет, ${"$"}{comrade}""${'"'}
+                    else -> ""${'"'}Hello, ${"$"}{comrade}""${'"'}
                   }
             
                   public override fun toString(): String = render()
@@ -199,18 +199,18 @@ class GeneratorTest {
         val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals("""
         package org.test.test
-
+        
         import kotlin.String
-
+        
         public object LoKal {
           public var locale: () -> String = { "~" }
-
+        
           public object Http {
             public class StatusMessage {
-              public fun render(): String = when(LoKal.locale()) {
-                else -> "Hello, comrade"
+              public fun render(): String = when(locale()) {
+                else -> ""${'"'}Hello, comrade""${'"'}
               }
-
+        
               public override fun toString(): String = render()
             }
           }
@@ -256,8 +256,8 @@ class GeneratorTest {
         
           public object Http {
             public class GroupMessage {
-              public fun render(): String = when(LoKal.locale()) {
-                else -> "Hello from group message"
+              public fun render(): String = when(locale()) {
+                else -> ""${'"'}Hello from group message""${'"'}
               }
         
               public override fun toString(): String = render()
@@ -265,8 +265,8 @@ class GeneratorTest {
         
             public object Error {
               public class GroupInGroupMessage {
-                public fun render(): String = when(LoKal.locale()) {
-                  else -> "Hello from group in group message"
+                public fun render(): String = when(locale()) {
+                  else -> ""${'"'}Hello from group in group message""${'"'}
                 }
         
                 public override fun toString(): String = render()
@@ -275,11 +275,50 @@ class GeneratorTest {
           }
         
           public class RootMessage {
-            public fun render(): String = when(LoKal.locale()) {
-              else -> "Hello from root message"
+            public fun render(): String = when(locale()) {
+              else -> ""${'"'}Hello from root message""${'"'}
             }
         
             public override fun toString(): String = render()
+          }
+        }
+
+        """.trimIndent(), fileSpec.asText())
+    }
+
+    @Test
+    fun `Generator should render large string into valid code`() {
+        val specification = Specification(
+            listOf(
+                Specification.Group(
+                    "http", listOf(
+                        Specification.Entry(
+                            "groupMessage",
+                            "Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message"
+                        )
+                    )
+                )
+            )
+        )
+
+        val fileSpec = Generator.generate("org.test.test", specification)
+        assertEquals("""
+        package org.test.test
+        
+        import kotlin.String
+        
+        public object LoKal {
+          public var locale: () -> String = { "~" }
+        
+          public object Http {
+            public class GroupMessage {
+              public fun render(): String = when(locale()) {
+                else ->
+                    ""${'"'}Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message""${'"'}
+              }
+        
+              public override fun toString(): String = render()
+            }
           }
         }
 
