@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("io.github.ferusm.lokal") version "0.2.0-SNAPSHOT"
+    id("io.github.ferusm.lokal") version "0.2.0"
 }
 
 repositories {
