@@ -1,4 +1,4 @@
-$version: 0.2.2
+$version: 0.3.0
 $summary: Example project text specification
 $description: For test porpoise
 
@@ -10,7 +10,7 @@ firstGroup:
     $summary: Example project text
     $description: For test porpoise
 
-    default: Hello, first comrade {name}
+    ~: Hello, first comrade {name}
     ru: Привет, первый товарисч {name}
 
 secondGroup:
@@ -21,5 +21,5 @@ secondGroup:
     $summary: Another example project text
     $description: For test porpoise
 
-    default: Hello, second comrade {name}
+    ~: Hello, second comrade {name}
     ru: Привет, второй товарисч {name}

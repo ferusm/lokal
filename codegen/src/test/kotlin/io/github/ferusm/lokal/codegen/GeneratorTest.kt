@@ -16,7 +16,7 @@ class GeneratorTest {
             import kotlin.String
 
             public object LoKal {
-              public var locale: () -> String = { "default" }
+              public var locale: () -> String = { "~" }
             }
 
         """.trimIndent(), fileSpec.asText()
@@ -34,7 +34,7 @@ class GeneratorTest {
             import kotlin.String
             
             public object LoKal {
-              public var locale: () -> String = { "default" }
+              public var locale: () -> String = { "~" }
 
               public object Http
             }
@@ -72,7 +72,7 @@ class GeneratorTest {
              * Summary - Root summary
              */
             public object LoKal {
-              public var locale: () -> String = { "default" }
+              public var locale: () -> String = { "~" }
             
               /**
                * Summary - Group summary
@@ -202,7 +202,7 @@ class GeneratorTest {
         import kotlin.String
         
         public object LoKal {
-          public var locale: () -> String = { "default" }
+          public var locale: () -> String = { "~" }
         
           public object Http {
             public class StatusMessage {

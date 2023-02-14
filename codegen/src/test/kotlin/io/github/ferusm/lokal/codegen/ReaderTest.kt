@@ -23,13 +23,13 @@ class ReaderTest {
                     )
                 )),
                 mapOf(
-                    "version" to "0.2.2",
+                    "version" to "0.3.0",
                     "summary" to "Http text entries",
                     "description" to "Http status messages and etc."
                 )
             )),
             mapOf(
-                "version" to "0.2.2",
+                "version" to "0.3.0",
                 "summary" to "Text entries",
                 "description" to "Status messages and etc."
             )

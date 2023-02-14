@@ -6,7 +6,7 @@ plugins {
 
 allprojects {
     group = "io.github.ferusm.lokal"
-    version = "0.2.2"
+    version = "0.3.0"
 
     repositories {
         mavenCentral()

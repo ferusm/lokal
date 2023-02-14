@@ -5,7 +5,7 @@ data class Specification(
     val metas: Map<String, String> = emptyMap()
 ) {
     companion object {
-        const val DEFAULT_KEY = "default"
+        const val DEFAULT_KEY = "~"
         const val META_PREFIX = "\$"
     }
 
