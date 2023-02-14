@@ -10,7 +10,7 @@ build.gradle.kts
 ```kotlin
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("io.github.ferusm.lokal") version "0.2.0"
+    id("io.github.ferusm.lokal") version "0.2.1"
 }
 
 repositories {
@@ -44,7 +44,7 @@ pluginManagement {
 
 translations/specification.yaml
 ```yaml
-$version: 0.2.0
+$version: 0.2.1
 $summary: Example project text specification
 $description: For test porpoise
 

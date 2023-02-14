@@ -12,13 +12,13 @@ import java.io.File
 
 abstract class LoKalGradlePluginTask : DefaultTask() {
     @InputFile
-    lateinit var input: File
+    var input: File? = null
 
     @Input
-    lateinit var pack: String
+    var pack: String? = null
 
     @OutputDirectory
-    lateinit var output: File
+    var output: File? = null
 
 
     init {
@@ -27,6 +27,20 @@ abstract class LoKalGradlePluginTask : DefaultTask() {
 
     @TaskAction
     fun run() {
+        val input = input ?: throw IllegalArgumentException("'input' parameter must be initialized with an spec file")
+        val output = output ?: throw IllegalArgumentException("'output' parameter must be initialized with an directory")
+        val pack = pack ?: throw IllegalArgumentException("'pack' parameter must be initialized with target package ref")
+
+        if (output.isFile) {
+            throw IllegalArgumentException("'output' must be a existent directory or points to desired directory location")
+        }
+
+        output.mkdirs()
+
+        if (!input.isFile) {
+            throw IllegalArgumentException("input must be a file")
+        }
+
         val specification = Reader.read(input)
         val fileSpec = Generator.generate(pack, specification)
         fileSpec.writeTo(output)
