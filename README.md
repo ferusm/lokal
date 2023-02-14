@@ -34,7 +34,7 @@ rootProject.name = "example"
 
 pluginManagement {
     repositories {
-        mavenCentral()
+        gradlePluginPortal()
         maven("https://jitpack.io") {
             name = "JitPack"
         }
