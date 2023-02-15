@@ -28,7 +28,10 @@ object Reader {
         Specification.Group(name, items, meta)
     }
 
-    private fun readEntry(name: String, node: JsonNode): Specification.Entry {
+    private fun readEntry(name: String, node: JsonNode): Specification.Entry = if (node.isTextual) {
+        val defaultValue = node.asText()
+        Specification.Entry(name, defaultValue)
+    } else {
         val translationNodeSequence = node.fields().asSequence().filterNotMeta()
         val translations = translationNodeSequence.onEach { (_, node) ->
             if (!node.isTextual) {
@@ -47,7 +50,7 @@ object Reader {
         } else {
             throw IllegalArgumentException("Default entry value parameter ${Specification.DEFAULT_KEY} must have primitive string value")
         }
-        return Specification.Entry(name, defaultValue, translations, metas)
+        Specification.Entry(name, defaultValue, translations, metas)
     }
 }
 
@@ -67,4 +70,4 @@ private fun JsonNode.parseMetas(): Map<String, String> {
     }.toMap()
 }
 
-private fun JsonNode.isEntity(): Boolean = has(Specification.DEFAULT_KEY)
+private fun JsonNode.isEntity(): Boolean = isTextual || has(Specification.DEFAULT_KEY)
