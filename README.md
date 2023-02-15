@@ -10,7 +10,7 @@ build.gradle.kts
 ```kotlin
 plugins {
     kotlin("jvm") version "1.8.0"
-    id("io.github.ferusm.lokal") version "0.6.0"
+    id("io.github.ferusm.lokal") version "0.7.0"
 }
 
 repositories {
@@ -44,33 +44,44 @@ pluginManagement {
 
 translations/specification.yaml
 ```yaml
-$version: 0.6.0
-$summary: Text entries
-$description: Status messages and etc.
-message:
-  $summary: Basic message
-  $description: Basic message for test porpoises
-  ~: Hello, comrade {name}
-  ru: Привет, товарисч {name}
-http:
-  $version: 0.6.0
-  $summary: Http text entries
-  $description: Http status messages and etc.
-  message:
-    $summary: Basic message
-    $description: Basic message for test porpoises
-    ~: Hello, comrade {name}
-    ru: Привет, товарисч {name}
-  http:
-    $version: 0.6.0
-    $summary: Http text entries
-    $description: Http status messages and etc.
-    message:
-      $summary: Basic message
-      $description: Basic message for test porpoises
-      ~: Hello, comrade {name}
-      ru: Привет, товарисч {name}
+$version: 0.7.0
+$summary: Example project text specification
+$description: For test porpoise
 
+firstMessage:
+  $summary: Example project text
+  $description: For test porpoise
+
+  ~: Hello, first comrade {name}
+  ru: Привет, первый товарисч {name}
+
+secondMessage: Hello, second comrade {name}
+
+firstGroup:
+  $summary: Example project text group
+  $description: For test porpoise
+
+  firstMessage:
+    $summary: Example project text
+    $description: For test porpoise
+
+    ~: Hello, first comrade {name}
+    ru: Привет, первый товарисч {name}
+
+  secondMessage: Hello, second comrade {name}
+
+secondGroup:
+  $summary: Another example project text group
+  $description: For test porpoise
+
+  someMessage:
+    $summary: Another example project text
+    $description: For test porpoise
+
+    ~: Hello, second comrade {name}
+    ru: Привет, второй товарисч {name}
+
+  secondMessage: Hello, second comrade {name}
 ```
 
 ## Help

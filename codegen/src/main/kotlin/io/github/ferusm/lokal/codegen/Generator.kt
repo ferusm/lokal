@@ -6,9 +6,10 @@ import java.util.*
 object Generator {
     private const val NAME = "LoKal"
 
+    @Suppress("UNCHECKED_CAST")
     fun generate(targetPackage: String, specification: Specification): FileSpec {
         val rootClassName = ClassName(targetPackage, NAME)
-        val rootTypeSpec = TypeSpec.objectBuilder(rootClassName)
+        val specBuilder = TypeSpec.objectBuilder(rootClassName)
 
         LambdaTypeName.get(returnType = Unit::class.asTypeName())
 
@@ -19,94 +20,96 @@ object Generator {
         ).initializer("{ %S }", Specification.DEFAULT_KEY)
             .mutable(true)
             .build()
-        rootTypeSpec.addProperty(rootLocalePropertySpec)
+        specBuilder.addProperty(rootLocalePropertySpec)
 
-        val types = specification.items.map { processItem(rootLocalePropertySpec, it) }.checkDuplications(rootTypeSpec)
+        val definitions = specification.items.map { processItem(rootLocalePropertySpec, it) }.groupBy { it::class }
 
-        rootTypeSpec.addTypes(types)
-        rootTypeSpec.addKdoc(specification.metas.toDocCodeBlock())
+        val objectDefinition = (definitions[TypeSpec::class] as List<TypeSpec>?)
+            ?.checkTypeDuplications(specBuilder) ?: emptyList()
+        specBuilder.addTypes(objectDefinition)
+
+        val funDefinitions = (definitions[FunSpec::class] as List<FunSpec>?)
+            ?.checkFunDuplications(specBuilder) ?: emptyList()
+        specBuilder.addFunctions(funDefinitions)
+
+        specBuilder.addKdoc(specification.metas.toDocCodeBlock())
 
         return FileSpec.builder(targetPackage, NAME)
-            .addType(rootTypeSpec.build())
+            .addType(specBuilder.build())
             .build()
     }
 
-    private fun processItem(localeSpec: PropertySpec, item: Specification.Item): TypeSpec = when (item) {
+    private fun processItem(localeSpec: PropertySpec, item: Specification.Item): Any = when (item) {
         is Specification.Entry -> processEntry(localeSpec, item)
         is Specification.Group -> processGroup(localeSpec, item)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun processGroup(localeSpec: PropertySpec, group: Specification.Group): TypeSpec {
         val specBuilder = TypeSpec.objectBuilder(group.name.capitalize())
 
-        val types = group.items.map { processItem(localeSpec, it) }.checkDuplications(specBuilder)
+        val definitions = group.items.map { processItem(localeSpec, it) }.groupBy { it::class }
 
-        specBuilder.addTypes(types)
+        val objectDefinition = (definitions[TypeSpec::class] as List<TypeSpec>?)
+            ?.checkTypeDuplications(specBuilder) ?: emptyList()
+        specBuilder.addTypes(objectDefinition)
+
+        val funDefinitions = (definitions[FunSpec::class] as List<FunSpec>?)
+            ?.checkFunDuplications(specBuilder) ?: emptyList()
+        specBuilder.addFunctions(funDefinitions)
+
         specBuilder.addKdoc(group.metas.toDocCodeBlock())
 
         return specBuilder.build()
     }
 
-    private fun List<TypeSpec>.checkDuplications(typeSpecBuilder: TypeSpec.Builder): List<TypeSpec> {
+    private fun List<TypeSpec>.checkTypeDuplications(specBuilder: TypeSpec.Builder): List<TypeSpec> {
         return onEach { child ->
-            if (typeSpecBuilder.typeSpecs.any { it.name == child.name }) {
-                throw IllegalArgumentException("Illegal item duplicate ${child.name}")
+            if (specBuilder.typeSpecs.any { it.name == child.name }) {
+                throw IllegalArgumentException("Illegal group duplicate ${child.name}")
             }
             if (count { it.name == child.name } > 1) {
-                throw IllegalArgumentException("Illegal item duplicate ${child.name}")
+                throw IllegalArgumentException("Illegal group duplicate ${child.name}")
             }
         }
     }
 
-    private fun processEntry(localeSpec: PropertySpec, entry: Specification.Entry): TypeSpec {
-        val specBuilder = TypeSpec.classBuilder(entry.name.capitalize())
+    private fun List<FunSpec>.checkFunDuplications(specBuilder: TypeSpec.Builder): List<FunSpec> {
+        return onEach { child ->
+            if (specBuilder.funSpecs.any { it.name == child.name }) {
+                throw IllegalArgumentException("Illegal entry duplicate ${child.name}")
+            }
+            if (count { it.name == child.name } > 1) {
+                throw IllegalArgumentException("Illegal entry duplicate ${child.name}")
+            }
+        }
+    }
+
+    private fun processEntry(localeSpec: PropertySpec, entry: Specification.Entry): FunSpec {
+        val specBuilder = FunSpec.builder(entry.name)
+            .addModifiers(KModifier.PUBLIC)
+            .returns(String::class)
 
         val defaultTemplateKeys = entry.default.getTemplateKeys()
         if (defaultTemplateKeys.isNotEmpty()) {
-            val constructorSpec = FunSpec.constructorBuilder().also {
-                defaultTemplateKeys.forEach { propertyKey ->
-                    it.addParameter(propertyKey, Any::class)
-                }
-            }.build()
-            specBuilder.primaryConstructor(constructorSpec)
-
-            val entryTypePropertySpecs = defaultTemplateKeys.map {
-                PropertySpec.builder(it, Any::class, KModifier.PUBLIC)
-                    .initializer(it)
-                    .build()
+            defaultTemplateKeys.forEach { templateKey ->
+                specBuilder.addParameter(templateKey, Any::class)
             }
-            specBuilder.addProperties(entryTypePropertySpecs)
         }
 
-        val entryValueParameterSpec = FunSpec.builder("render")
-            .addModifiers(KModifier.PUBLIC)
-            .returns(String::class)
-            .beginControlFlow("return when(%N())", localeSpec)
-            .apply {
-                entry.translations.onEach { (name, value) ->
-                    val templateKeys = value.getTemplateKeys()
-                    if (templateKeys != defaultTemplateKeys) {
-                        throw IllegalArgumentException("Unexpected template keys in $name entry. Template keys in each translation must be the same as in default translation")
-                    }
-                }.forEach { (locale, value) ->
-                    addStatement("%S -> %P", locale, value.replace("{", "\${"))
-                }
-                addStatement("else -> %P", entry.default.replace("{", "\${"))
-            }.endControlFlow().build()
-        specBuilder.addFunction(entryValueParameterSpec)
+        specBuilder.beginControlFlow("return when(%N())", localeSpec)
+        entry.translations.onEach { (name, value) ->
+            val templateKeys = value.getTemplateKeys()
+            if (templateKeys != defaultTemplateKeys) {
+                throw IllegalArgumentException("Unexpected template keys in $name entry. Template keys in each translation must be the same as in default translation")
+            }
+        }.forEach { (locale, value) ->
+            specBuilder.addStatement("%S -> %P", locale, value.replace("{", "\${"))
+        }
+        specBuilder.addStatement("else -> %P", entry.default.replace("{", "\${"))
+        specBuilder.endControlFlow()
 
-        val entryTypeToStringFunction = FunSpec.builder("toString")
-            .addModifiers(KModifier.OVERRIDE)
-            .returns(String::class)
-            .addStatement("return %N()", entryValueParameterSpec)
-            .build()
-
-        specBuilder.addFunction(entryTypeToStringFunction)
         specBuilder.addKdoc(entry.metas.toDocCodeBlock())
-
-        if (defaultTemplateKeys.isNotEmpty()) {
-            specBuilder.addModifiers(KModifier.DATA)
-        }
 
         return specBuilder.build()
     }

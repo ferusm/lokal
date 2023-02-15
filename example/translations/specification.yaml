@@ -1,6 +1,15 @@
-$version: 0.6.0
+$version: 0.7.0
 $summary: Example project text specification
 $description: For test porpoise
+
+firstMessage:
+  $summary: Example project text
+  $description: For test porpoise
+
+  ~: Hello, first comrade {name}
+  ru: Привет, первый товарисч {name}
+
+secondMessage: Hello, second comrade {name}
 
 firstGroup:
   $summary: Example project text group
@@ -13,6 +22,8 @@ firstGroup:
     ~: Hello, first comrade {name}
     ru: Привет, первый товарисч {name}
 
+  secondMessage: Hello, second comrade {name}
+
 secondGroup:
   $summary: Another example project text group
   $description: For test porpoise
@@ -23,3 +34,5 @@ secondGroup:
 
     ~: Hello, second comrade {name}
     ru: Привет, второй товарисч {name}
+
+  secondMessage: Hello, second comrade {name}

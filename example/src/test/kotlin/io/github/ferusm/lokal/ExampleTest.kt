@@ -7,40 +7,36 @@ import kotlin.test.assertEquals
 
 class ExampleTest {
     @Test
-    fun `All phrases should be generated as classes`() {
-        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
-        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+    fun `All phrases should be generated as inline functions`() {
+        assertEquals("Hello, first comrade Petr", LoKal.FirstGroup.firstMessage("Petr"))
+        assertEquals("Hello, second comrade Ivan", LoKal.SecondGroup.someMessage("Ivan"))
     }
 
     @Test
     fun `Locale parameter should control language`() {
-        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
-        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+        assertEquals("Hello, first comrade Petr", LoKal.FirstGroup.firstMessage("Petr"))
+        assertEquals("Hello, second comrade Ivan", LoKal.SecondGroup.someMessage("Ivan"))
 
         LoKal.locale = { "ru" }
 
-        assertEquals("Привет, первый товарисч Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
-        assertEquals("Привет, второй товарисч Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+        assertEquals("Привет, первый товарисч Petr", LoKal.FirstGroup.firstMessage("Petr"))
+        assertEquals("Привет, второй товарисч Ivan", LoKal.SecondGroup.someMessage("Ivan"))
     }
 
     @Test
     fun `Default locale should be used if entry don't have proper translation`() {
-        assertEquals("Привет, первый товарисч Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
-        assertEquals("Привет, второй товарисч Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+        assertEquals("Привет, первый товарисч Petr", LoKal.FirstGroup.firstMessage("Petr"))
+        assertEquals("Привет, второй товарисч Ivan", LoKal.SecondGroup.someMessage("Ivan"))
 
         LoKal.locale = { "jp" }
 
-        assertEquals("Hello, first comrade Petr", "${LoKal.FirstGroup.FirstMessage("Petr")}")
-        assertEquals("Hello, second comrade Ivan", "${LoKal.SecondGroup.SomeMessage("Ivan")}")
+        assertEquals("Hello, first comrade Petr", LoKal.FirstGroup.firstMessage("Petr"))
+        assertEquals("Hello, second comrade Ivan", LoKal.SecondGroup.someMessage("Ivan"))
     }
 
-    @Test
-    fun `Render method should return same as toString method return`() {
-        assertEquals(LoKal.FirstGroup.FirstMessage("Petr").render(), "${LoKal.FirstGroup.FirstMessage("Petr")}")
-    }
 
     @Test
     fun `Template constructor should apply Kotlin Any parameters`() {
-        assertEquals("Hello, second comrade 1", "${LoKal.SecondGroup.SomeMessage(1)}")
+        assertEquals("Hello, second comrade 1", LoKal.SecondGroup.someMessage(1))
     }
 }

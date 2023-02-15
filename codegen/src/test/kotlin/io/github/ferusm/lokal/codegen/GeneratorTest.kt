@@ -82,15 +82,9 @@ class GeneratorTest {
                 /**
                  * Summary - Entry summary
                  */
-                public data class StatusMessage(
-                  public val comrade: Any,
-                ) {
-                  public fun render(): String = when(locale()) {
-                    "ru" -> ""${'"'}Привет, ${"$"}{comrade}""${'"'}
-                    else -> ""${'"'}Hello, ${"$"}{comrade}""${'"'}
-                  }
-            
-                  public override fun toString(): String = render()
+                public inline fun statusMessage(comrade: Any): String = when(locale()) {
+                  "ru" -> ""${'"'}Привет, ${"$"}{comrade}""${'"'}
+                  else -> ""${'"'}Hello, ${"$"}{comrade}""${'"'}
                 }
               }
             }
@@ -206,12 +200,8 @@ class GeneratorTest {
           public var locale: () -> String = { "~" }
         
           public object Http {
-            public class StatusMessage {
-              public fun render(): String = when(locale()) {
-                else -> ""${'"'}Hello, comrade""${'"'}
-              }
-        
-              public override fun toString(): String = render()
+            public inline fun statusMessage(): String = when(locale()) {
+              else -> ""${'"'}Hello, comrade""${'"'}
             }
           }
         }
@@ -248,38 +238,26 @@ class GeneratorTest {
         val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals("""
         package org.test.test
-
+        
         import kotlin.String
         
         public object LoKal {
           public var locale: () -> String = { "~" }
         
-          public object Http {
-            public class GroupMessage {
-              public fun render(): String = when(locale()) {
-                else -> ""${'"'}Hello from group message""${'"'}
-              }
+          public inline fun rootMessage(): String = when(locale()) {
+            else -> ""${'"'}Hello from root message""${'"'}
+          }
         
-              public override fun toString(): String = render()
+          public object Http {
+            public inline fun groupMessage(): String = when(locale()) {
+              else -> ""${'"'}Hello from group message""${'"'}
             }
         
             public object Error {
-              public class GroupInGroupMessage {
-                public fun render(): String = when(locale()) {
-                  else -> ""${'"'}Hello from group in group message""${'"'}
-                }
-        
-                public override fun toString(): String = render()
+              public inline fun groupInGroupMessage(): String = when(locale()) {
+                else -> ""${'"'}Hello from group in group message""${'"'}
               }
             }
-          }
-        
-          public class RootMessage {
-            public fun render(): String = when(locale()) {
-              else -> ""${'"'}Hello from root message""${'"'}
-            }
-        
-            public override fun toString(): String = render()
           }
         }
 
@@ -304,20 +282,16 @@ class GeneratorTest {
         val fileSpec = Generator.generate("org.test.test", specification)
         assertEquals("""
         package org.test.test
-        
+
         import kotlin.String
         
         public object LoKal {
           public var locale: () -> String = { "~" }
         
           public object Http {
-            public class GroupMessage {
-              public fun render(): String = when(locale()) {
-                else ->
-                    ""${'"'}Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message""${'"'}
-              }
-        
-              public override fun toString(): String = render()
+            public inline fun groupMessage(): String = when(locale()) {
+              else ->
+                  ""${'"'}Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message. Hello from group message""${'"'}
             }
           }
         }
